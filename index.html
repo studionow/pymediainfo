@@ -66,6 +66,28 @@ can call the constructor directly:</p>
 <span class="n">media_info</span> <span class="o">=</span> <span class="n">MediaInfo</span><span class="p">(</span><span class="n">raw_xml_string</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>Since the attributes on the <cite>Track</cite> objects are being dynamically added as the
+XML output from MediaInfo is being parsed, there isn&#8217;t a firm definition of what
+will be available at runtime.  In order to make consuming the objects easier so
+that you can avoid having to use <cite>hasattr</cite> or <cite>try/except</cite> blocks, the
+<cite>__getattribute__</cite> method has been overriden and will just return <cite>None</cite> when
+and if an attribute is referenced but doesn&#8217;t exist.</p>
+<p>This will enable you to write consuming code like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">pymediainfo</span> <span class="kn">import</span> <span class="n">MediaInfo</span>
+<span class="n">media_info</span> <span class="o">=</span> <span class="n">MediaInfo</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s">&#39;my_video_file.mov&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">track</span> <span class="ow">in</span> <span class="n">media_info</span><span class="o">.</span><span class="n">tracks</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">track</span><span class="o">.</span><span class="n">bit_rate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">track</span><span class="o">.</span><span class="n">track_type</span><span class="p">,</span> <span class="n">track</span><span class="o">.</span><span class="n">bit_rate</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s"> tracks do not have bit rate associated with them.&quot;</span> <span class="o">%</span> <span class="n">track</span><span class="o">.</span><span class="n">track_type</span>
+</pre></div>
+</div>
+<p>Output:</p>
+<div class="highlight-python"><pre>General tracks do not have bit rate associated with them.
+Video: 46033920
+Audio: 1536000
+Menu tracks do not have bit rate associated with them.</pre>
+</div>
 </div>
 <div class="section" id="reporting-issues-bugs">
 <h2>Reporting Issues / Bugs<a class="headerlink" href="#reporting-issues-bugs" title="Permalink to this headline">¶</a></h2>
