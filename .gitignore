@@ -1,2 +1,4 @@
 *.pyc
 doctrees
+dist/*
+*egg-info/*
