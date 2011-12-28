@@ -2,10 +2,10 @@ from setuptools import setup, find_packages
 
 setup(
     name='pymediainfo',
-    version = '1.3.3',
-    author='Patrick Altman',
-    author_email='paltman@gmail.com',
-    url='git@github.com/paltman/pymediainfo.git',
+    version = '1.3.5',
+    author='StudioNow',
+    author_email='developers@studionow.com',
+    url='git@github.com/studionow/pymediainfo.git',
     description="""A Python wrapper for the mediainfo command line tool.""",
     packages=find_packages(),
     namespace_packages = [],

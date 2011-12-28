@@ -1,12 +1,11 @@
-from subprocess import Popen
+import subprocess
 from xml.dom import minidom
 import simplejson
-import os
-from tempfile import mkstemp
 
 __version__ = '1.3.2'
 
 ENV_DICT = {
+    "LANG": "en_US.UTF-8",
     "PATH": "/usr/local/bin/:/usr/bin/",
     "LD_LIBRARY_PATH": "/usr/local/lib/:/usr/lib/"}
 
@@ -79,17 +78,9 @@ class MediaInfo(object):
     @staticmethod
     def parse(filename, environment=ENV_DICT):
         command = ["mediainfo", "-f", "--Output=XML", filename]
-        fileno_out, fname_out = mkstemp(suffix=".xml", prefix="media-")
-        fileno_err, fname_err = mkstemp(suffix=".err", prefix="media-")
-        fp_out = os.fdopen(fileno_out, 'r+b')
-        fp_err = os.fdopen(fileno_err, 'r+b')
-        p = Popen(command, stdout=fp_out, stderr=fp_err, env=environment)
-        p.wait()
-        fp_out.seek(0)
-
-        xml_dom = MediaInfo.parse_xml_data_into_dom(fp_out.read())
-        fp_out.close()
-        fp_err.close()
+        p = subprocess.Popen(command, env=environment, stdout=subprocess.PIPE)
+        stdout_data, stderr_data = p.communicate()
+        xml_dom = MediaInfo.parse_xml_data_into_dom(stdout_data)
         return MediaInfo(xml_dom)
 
     def _populate_tracks(self):
