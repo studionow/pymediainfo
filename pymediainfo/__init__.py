@@ -71,6 +71,11 @@ class MediaInfo(object):
         dom = None
         try:
             dom = minidom.parseString(xml_data)
+        except ExpatError:
+            try:
+                dom = minidom.parseString(xml_data.replace("<>00:00:00:00</>", ""))
+            except:
+                pass
         except:
             pass
         return dom
