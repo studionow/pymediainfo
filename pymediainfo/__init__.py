@@ -1,5 +1,6 @@
 import subprocess
 from xml.dom import minidom
+from xml.parsers.expat import ExpatError
 import simplejson
 
 __version__ = '1.3.2'
@@ -15,7 +16,7 @@ class Track(object):
     def __getattribute__(self, name):
         try:
             return object.__getattribute__(self, name)
-        except:
+        except Exception:
             pass
         return None
 
@@ -37,19 +38,32 @@ class Track(object):
                     else:
                         getattr(self, other_node_name).append(node_value)
 
-        for o in [d for d in self.__dict__.keys() if d.startswith('other_')]:
+        for other_property in [d for d in self.__dict__.keys() if d.startswith('other_')]:
+            primary = other_property.replace('other_', '')
             try:
-                primary = o.replace('other_', '')
                 setattr(self, primary, int(getattr(self, primary)))
-            except:
-                for v in getattr(self, o):
+            except Exception:
+                for v in getattr(self, other_property):
                     try:
                         current = getattr(self, primary)
                         setattr(self, primary, int(v))
-                        getattr(self, o).append(current)
+                        getattr(self, other_property).append(current)
                         break
-                    except:
+                    except Exception:
                         pass
+
+        # Handle possible Original Height and Original Width values
+        height = getattr(self, "original_height")
+        adjusted_height = getattr(self, "height")
+        if height:
+            setattr(self, "height", height)
+            setattr(self, "adjusted_height", adjusted_height)
+
+        width = getattr(self, "original_width")
+        adjusted_width = getattr(self, "width")
+        if width:
+            setattr(self, "width", width)
+            setattr(self, "adjusted_width", adjusted_width)
 
     def to_data(self):
         data = {}
@@ -74,9 +88,9 @@ class MediaInfo(object):
         except ExpatError:
             try:
                 dom = minidom.parseString(xml_data.replace("<>00:00:00:00</>", ""))
-            except:
+            except Exception:
                 pass
-        except:
+        except Exception:
             pass
         return dom
 
@@ -89,16 +103,15 @@ class MediaInfo(object):
         return MediaInfo(xml_dom)
 
     def _populate_tracks(self):
-        if self.xml_dom is None:
-            return
-        for xml_track in self.xml_dom.getElementsByTagName("track"):
-            self._tracks.append(Track(xml_track))
+        if self.xml_dom:
+            for xml_track in self.xml_dom.getElementsByTagName("track"):
+                self._tracks.append(Track(xml_track))
 
     @property
     def tracks(self):
         if not hasattr(self, "_tracks"):
             self._tracks = []
-        if len(self._tracks) == 0:
+        if not len(self._tracks):
             self._populate_tracks()
         return self._tracks
 
