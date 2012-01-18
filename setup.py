@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pymediainfo',
-    version = '1.3.6',
+    version = '1.3.7',
     author='StudioNow',
     author_email='developers@studionow.com',
     url='git@github.com/studionow/pymediainfo.git',
