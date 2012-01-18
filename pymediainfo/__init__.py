@@ -1,3 +1,4 @@
+import re
 import subprocess
 from xml.dom import minidom
 from xml.parsers.expat import ExpatError
@@ -82,6 +83,11 @@ class MediaInfo(object):
 
     @staticmethod
     def parse_xml_data_into_dom(xml_data):
+        # Manually get rid of control characters in random proprietary
+        # output - usually specific to a manufacturer
+        pattern = r"<AMBA>.*</AMBA>"
+        xml_data = re.sub(pattern, "", xml_data)
+
         dom = None
         try:
             dom = minidom.parseString(xml_data)
