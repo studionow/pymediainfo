@@ -1,4 +1,4 @@
 *.pyc
-doctrees
-dist/*
-*egg-info/*
+/doctrees
+/dist/
+/*egg-info/*
